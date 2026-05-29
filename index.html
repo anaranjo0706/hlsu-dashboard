@@ -16,7 +16,28 @@
   --r:6px;--rl:10px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);background:var(--surface2);min-height:100vh}
-.shell{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--surface2);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:2.5rem 2rem;width:360px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.1);display:flex;flex-direction:column;gap:1.25rem}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.login-garnet-bar{width:32px;height:3px;background:var(--garnet);border-radius:2px}
+.login-brand-name{font-size:18px;font-weight:700;color:var(--text)}
+.login-brand-sub{font-size:12px;color:var(--text3)}
+.login-title{font-size:15px;font-weight:500;color:var(--text);text-align:center}
+.login-field{display:flex;flex-direction:column;gap:4px}
+.login-label{font-size:11px;color:var(--text2);font-weight:500}
+.login-input{font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 10px;width:100%;outline:none;background:var(--surface);color:var(--text)}
+.login-input:focus{border-color:var(--garnet)}
+.login-btn{background:var(--garnet);color:#fff;border:none;border-radius:var(--r);padding:10px;font-size:13px;font-weight:500;cursor:pointer;width:100%;transition:background .15s}
+.login-btn:hover{background:var(--garnet-light)}
+.login-btn:disabled{background:#bbb;cursor:not-allowed}
+.login-error{font-size:12px;color:#e24b4a;text-align:center;min-height:16px}
+.login-note{font-size:11px;color:var(--text3);text-align:center;line-height:1.5}
+
+/* APP */
+.app-shell{display:none}
+.app-shell.visible{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
 .sidebar{background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
 .main{display:flex;flex-direction:column;min-height:100vh}
 .sb-brand{padding:1.25rem 1rem 1rem;border-bottom:0.5px solid var(--border)}
@@ -30,6 +51,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .sb-item.active{background:var(--garnet-bg);color:var(--garnet);font-weight:500}
 .sb-footer{margin-top:auto;padding:1rem;border-top:0.5px solid var(--border)}
 .sec-avatar{width:30px;height:30px;border-radius:50%;background:var(--garnet-bg);color:var(--garnet);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logout-btn{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 0;margin-top:6px;transition:color .15s}
+.logout-btn:hover{color:var(--garnet)}
 .topbar{padding:.85rem 1.5rem;border-bottom:0.5px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:1rem;flex-shrink:0}
 .topbar-title{font-size:15px;font-weight:500;color:var(--text);flex:1}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface);color:var(--text);cursor:pointer;transition:background .15s;text-decoration:none}
@@ -40,6 +63,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .btn i{font-size:14px}
 .page{display:none;flex:1}
 .page.active{display:block}
+
 .positions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;padding:1.5rem}
 .pos-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:1rem 1.1rem;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .pos-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -154,10 +178,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .drive-blocked i{font-size:40px;color:var(--text3);opacity:.4}
 .drive-blocked-title{font-size:15px;font-weight:500;color:var(--text)}
 .drive-blocked-sub{font-size:13px;color:var(--text3);max-width:360px;line-height:1.6}
+.saving-indicator{position:fixed;bottom:1rem;right:1rem;background:var(--garnet);color:#fff;font-size:11px;padding:6px 12px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none}
+.saving-indicator.show{opacity:1}
 </style>
 </head>
 <body>
-<div class="shell">
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-garnet-bar"></div>
+      <div class="login-brand-name">HLSU · FSU</div>
+      <div class="login-brand-sub">Secretary Dashboard</div>
+    </div>
+    <div class="login-title">Sign in to continue</div>
+    <div class="login-field">
+      <label class="login-label">Email</label>
+      <input class="login-input" type="email" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-note">Access is by invitation only.<br>Contact the secretary if you need an account.</div>
+  </div>
+</div>
+
+<!-- SAVING INDICATOR -->
+<div class="saving-indicator" id="saving-indicator">Saving…</div>
+
+<!-- APP -->
+<div class="app-shell" id="app-shell">
 <aside class="sidebar">
   <div class="sb-brand">
     <div class="sb-garnet-bar"></div>
@@ -171,12 +225,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
     <div style="display:flex;align-items:center;gap:8px">
       <div class="sec-avatar" id="sec-av">S</div>
       <div>
-        <div style="font-size:12px;font-weight:500;color:var(--text);cursor:pointer" id="sec-name-el" contenteditable="true" title="Click to edit your name">Secretary</div>
-        <div style="font-size:10px;color:var(--text3)">Club Secretary · HLSU</div>
+        <div style="font-size:12px;font-weight:500;color:var(--text)" id="user-email-display">User</div>
+        <div style="font-size:10px;color:var(--text3)">HLSU Board Member</div>
       </div>
     </div>
+    <button class="logout-btn" onclick="doLogout()"><i class="ti ti-logout" style="font-size:13px"></i> Sign out</button>
   </div>
 </aside>
+
 <main class="main">
   <div class="page active" id="page-board">
     <div class="topbar">
@@ -188,16 +244,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
   <div class="page" id="page-docs">
     <div class="topbar">
       <div class="topbar-title" style="flex:1">Documents</div>
-      <div class="docs-topbar-note"><i class="ti ti-brand-google-drive"></i> Live view of your Google Drive folder</div>
+      <div class="docs-topbar-note"><i class="ti ti-brand-google-drive"></i> Live Google Drive folder</div>
       <a class="btn" href="https://drive.google.com/drive/folders/1haQeIv4qWssN3VbS5ea1L8D131jF_XUu" target="_blank"><i class="ti ti-external-link"></i> Open in Drive</a>
     </div>
     <div class="docs-page">
-      <div class="drive-frame-wrap" id="drive-frame-wrap">
+      <div class="drive-frame-wrap">
         <iframe id="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1haQeIv4qWssN3VbS5ea1L8D131jF_XUu#list" title="HLSU Google Drive Folder" allowfullscreen></iframe>
         <div class="drive-blocked" id="drive-blocked">
           <i class="ti ti-brand-google-drive"></i>
           <div class="drive-blocked-title">Google Drive preview unavailable</div>
-          <div class="drive-blocked-sub">Your browser is blocking the embedded preview. Open the folder directly in Google Drive to view and manage files.</div>
+          <div class="drive-blocked-sub">Your browser is blocking the embedded preview. Open the folder directly in Google Drive.</div>
           <a class="btn btn-primary" href="https://drive.google.com/drive/folders/1haQeIv4qWssN3VbS5ea1L8D131jF_XUu" target="_blank"><i class="ti ti-external-link"></i> Open Google Drive folder</a>
         </div>
       </div>
@@ -206,6 +262,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 </main>
 </div>
 
+<!-- ADD TASK MODAL -->
 <div class="add-task-modal-bg" id="add-task-modal">
   <div class="add-task-modal">
     <div class="modal-title">Add task</div>
@@ -234,7 +291,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
   </div>
 </div>
 
-<script>
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBenJ_qBdZa4luiy-5e_vagVZMe7gukolc",
+  authDomain: "hlsu-dashboard.firebaseapp.com",
+  databaseURL: "https://hlsu-dashboard-default-rtdb.firebaseio.com",
+  projectId: "hlsu-dashboard",
+  storageBucket: "hlsu-dashboard.firebasestorage.app",
+  messagingSenderId: "597776445255",
+  appId: "1:597776445255:web:d17ce180285c3d2a512662"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
 const POSITIONS=[
   {id:'treasurer',label:'Treasurer',seats:1,holders:['']},
   {id:'outreach',label:'Outreach Coordinator',seats:2,holders:['','']},
@@ -248,45 +324,113 @@ const POSITIONS=[
   {id:'video',label:'Videography Chair',seats:1,holders:['']},
   {id:'comaffairs',label:'Community Affairs Chair',seats:1,holders:['']},
 ];
-let tasks=[],currentPos=null,secName='Secretary',modalOwners=[];
-function load(){
-  try{tasks=JSON.parse(localStorage.getItem('hlsu10_tasks')||'[]');}catch(e){tasks=[];}
-  try{secName=localStorage.getItem('hlsu10_secname')||'Secretary';}catch(e){}
-  POSITIONS.forEach(p=>{try{let h=JSON.parse(localStorage.getItem('hlsu10_h_'+p.id));if(h&&h.length)p.holders=h;}catch(e){}});
+
+let tasks={}, currentPos=null, modalOwners=[], currentUser=null;
+
+// ── AUTH ──────────────────────────────────────────
+window.doLogin=function(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  if(!email||!password){errEl.textContent='Please enter your email and password.';return;}
+  btn.disabled=true;btn.textContent='Signing in…';errEl.textContent='';
+  signInWithEmailAndPassword(auth,email,password)
+    .catch(err=>{
+      btn.disabled=false;btn.textContent='Sign in';
+      if(err.code==='auth/user-not-found'||err.code==='auth/wrong-password'||err.code==='auth/invalid-credential'){errEl.textContent='Invalid email or password.';}
+      else{errEl.textContent='Error: '+err.message;}
+    });
+};
+
+window.doLogout=function(){
+  signOut(auth);
+};
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    currentUser=user;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-shell').classList.add('visible');
+    document.getElementById('login-btn').disabled=false;
+    document.getElementById('login-btn').textContent='Sign in';
+    // Show email in sidebar
+    const emailDisplay=document.getElementById('user-email-display');
+    emailDisplay.textContent=user.email;
+    const parts=user.email.split('@')[0].split('.');
+    const av=document.getElementById('sec-av');
+    av.textContent=(parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();
+    // Start listening to DB
+    listenToData();
+    renderBoard();
+  } else {
+    currentUser=null;
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app-shell').classList.remove('visible');
+  }
+});
+
+// ── FIREBASE DATA ─────────────────────────────────
+function listenToData(){
+  onValue(ref(db,'tasks'),snap=>{
+    tasks=snap.val()||{};
+    renderBoard();
+  });
+  onValue(ref(db,'holders'),snap=>{
+    const holders=snap.val()||{};
+    POSITIONS.forEach(p=>{if(holders[p.id])p.holders=holders[p.id];});
+    renderBoard();
+  });
 }
-function saveTasks(){localStorage.setItem('hlsu10_tasks',JSON.stringify(tasks));}
+
+function showSaving(){
+  const el=document.getElementById('saving-indicator');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1500);
+}
+
+function saveTask(task){
+  showSaving();
+  set(ref(db,'tasks/'+task.id),task);
+}
+function deleteTaskDB(id){
+  showSaving();
+  remove(ref(db,'tasks/'+id));
+}
+function saveHolders(posId,holders){
+  showSaving();
+  set(ref(db,'holders/'+posId),holders);
+}
+
+// ── HELPERS ───────────────────────────────────────
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function twoWeeksBefore(d){if(!d)return'';const dt=new Date(d+'T00:00:00');dt.setDate(dt.getDate()-14);return dt.toISOString().slice(0,10);}
 function fmtDate(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function initials(n){if(!n||!n.trim())return'?';const p=n.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
-function initSec(){
-  const el=document.getElementById('sec-name-el');el.textContent=secName;
-  const av=document.getElementById('sec-av');
-  const upAv=n=>{const p=n.trim().split(' ');av.textContent=(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();};
-  upAv(secName);
-  el.onblur=()=>{secName=el.textContent.trim()||'Secretary';el.textContent=secName;localStorage.setItem('hlsu10_secname',secName);upAv(secName);};
-}
-function nav(page,el){
+
+// ── NAV ───────────────────────────────────────────
+window.nav=function(page,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   if(el)el.classList.add('active');
   if(page==='board')renderBoard();
-}
-setTimeout(()=>{
-  const iframe=document.getElementById('drive-iframe');
-  if(!iframe)return;
-  try{const doc=iframe.contentDocument||iframe.contentWindow?.document;if(doc&&doc.body&&doc.body.innerHTML===''){document.getElementById('drive-iframe').style.display='none';document.getElementById('drive-blocked').style.display='flex';}}catch(e){}
-},8000);
+};
+
+// ── PROGRESS ──────────────────────────────────────
 function posProgress(posId){
-  const pt=tasks.filter(t=>t.pos===posId);let total=0,done=0;
+  const pt=Object.values(tasks).filter(t=>t.pos===posId);
+  let total=0,done=0;
   pt.forEach(t=>{if(t.checklist&&t.checklist.length){total+=t.checklist.length;done+=t.checklist.filter(c=>c.checked).length;}});
   return{total,done,pct:total?Math.round(done/total*100):0};
 }
+
+// ── RENDER BOARD ──────────────────────────────────
 function renderBoard(){
   const titleEl=document.getElementById('board-title');
   const actionsEl=document.getElementById('board-actions');
   const content=document.getElementById('board-content');
+  if(!content)return;
   if(!currentPos){
     titleEl.textContent='Board & Tasks';actionsEl.innerHTML='';content.innerHTML='';
     const grid=document.createElement('div');grid.className='positions-grid';
@@ -300,7 +444,7 @@ function renderBoard(){
     content.appendChild(grid);return;
   }
   const p=POSITIONS.find(x=>x.id===currentPos);
-  const pt=tasks.filter(t=>t.pos===currentPos);
+  const pt=Object.values(tasks).filter(t=>t.pos===currentPos);
   const{total,done,pct}=posProgress(currentPos);
   titleEl.textContent=p.label;
   actionsEl.innerHTML='<button class="btn" onclick="currentPos=null;renderBoard()"><i class="ti ti-arrow-left"></i> Back</button>';
@@ -314,10 +458,12 @@ function renderBoard(){
   tasksHeader.appendChild(addBtn);wrap.appendChild(tasksHeader);
   const tasksGrid=document.createElement('div');tasksGrid.className='tasks-grid';tasksGrid.id='tasks-grid';
   if(pt.length===0){tasksGrid.innerHTML='<div class="empty-tasks"><i class="ti ti-checklist"></i>No tasks yet — add the first one above.</div>';}
-  else{pt.forEach(t=>tasksGrid.appendChild(buildBubble(t)));}
+  else{pt.forEach(t=>tasksGrid.appendChild(buildBubble(t,p)));}
   wrap.appendChild(tasksGrid);content.appendChild(wrap);
 }
-function buildBubble(t){
+
+function buildBubble(t,p){
+  if(!p)p=POSITIONS.find(x=>x.id===t.pos);
   const bubble=document.createElement('div');bubble.className='task-bubble';bubble.id='bubble-'+t.id;
   const dateDisplay=t.proposedDate?'<span class="task-date-chip"><i class="ti ti-calendar"></i>'+fmtDate(t.proposedDate)+'</span>':'<span style="font-size:10px;color:var(--text3);font-style:italic">No date set</span>';
   const top=document.createElement('div');top.className='task-bubble-top';
@@ -329,16 +475,17 @@ function buildBubble(t){
   bubble.appendChild(ownersRow);
   if(t.desc){const desc=document.createElement('div');desc.className='task-bubble-desc';desc.textContent=t.desc;bubble.appendChild(desc);}
   const clSection=document.createElement('div');clSection.className='checklist-section';
-  if(t.checklist&&t.checklist.length>0){
-    const clDone=t.checklist.filter(c=>c.checked).length;
-    const clTotal=t.checklist.length;const clPct=Math.round(clDone/clTotal*100);
+  const checklist=t.checklist||[];
+  if(checklist.length>0){
+    const clDone=checklist.filter(c=>c.checked).length;
+    const clTotal=checklist.length;const clPct=Math.round(clDone/clTotal*100);
     const progRow=document.createElement('div');progRow.className='checklist-progress-row';
     progRow.innerHTML='<div class="cl-prog-wrap"><div class="cl-prog-bar" id="clpb-'+t.id+'" style="width:'+clPct+'%"></div></div><span class="checklist-pct" id="clpct-'+t.id+'">'+clDone+'/'+clTotal+'</span>';
     clSection.appendChild(progRow);
     const headers=document.createElement('div');headers.className='cl-col-headers';
     headers.innerHTML='<div></div><div class="cl-col-hdr">Item</div><div class="cl-col-hdr">Due date</div><div class="cl-col-hdr">Notes</div><div></div>';
     clSection.appendChild(headers);
-    t.checklist.forEach((item,idx)=>{
+    checklist.forEach((item,idx)=>{
       const autoDate=twoWeeksBefore(t.proposedDate);
       const displayDate=item.customDue||autoDate;
       const isCustom=!!(item.customDue&&item.customDue!==autoDate);
@@ -355,30 +502,78 @@ function buildBubble(t){
   bubble.appendChild(editForm);
   return bubble;
 }
-function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
-function updateClDue(taskId,idx,val){const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist)return;const auto=twoWeeksBefore(t.proposedDate);t.checklist[idx].customDue=(val===auto)?'':val;saveTasks();renderBoard();}
-function updateClNotes(taskId,idx,val){const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist)return;t.checklist[idx].notes=val;saveTasks();}
-function toggleCheck(taskId,idx){const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist)return;t.checklist[idx].checked=!t.checklist[idx].checked;saveTasks();updateProgressUI(taskId);updatePosProgress();}
+
+// ── TASK ACTIONS ──────────────────────────────────
+window.autoResize=function(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';};
+
+window.toggleCheck=function(taskId,idx){
+  const t=tasks[taskId];if(!t)return;
+  if(!t.checklist)t.checklist=[];
+  t.checklist[idx].checked=!t.checklist[idx].checked;
+  saveTask(t);
+  updateProgressUI(taskId);updatePosProgress();
+};
+
 function updateProgressUI(taskId){
-  const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist||!t.checklist.length)return;
-  const done=t.checklist.filter(c=>c.checked).length;const total=t.checklist.length;const pct=Math.round(done/total*100);
+  const t=tasks[taskId];if(!t||!t.checklist||!t.checklist.length)return;
+  const done=t.checklist.filter(c=>c.checked).length;
+  const total=t.checklist.length;const pct=Math.round(done/total*100);
   const pb=document.getElementById('clpb-'+taskId);const pl=document.getElementById('clpct-'+taskId);
   if(pb)pb.style.width=pct+'%';if(pl)pl.textContent=done+'/'+total;
   const bubble=document.getElementById('bubble-'+taskId);
-  if(bubble){bubble.querySelectorAll('.cl-check').forEach((ch,i)=>{if(t.checklist[i])ch.className='cl-check'+(t.checklist[i].checked?' checked':'');});bubble.querySelectorAll('.cl-label').forEach((lb,i)=>{if(t.checklist[i])lb.className='cl-label'+(t.checklist[i].checked?' checked':'');});}
+  if(bubble){
+    bubble.querySelectorAll('.cl-check').forEach((ch,i)=>{if(t.checklist[i])ch.className='cl-check'+(t.checklist[i].checked?' checked':'');});
+    bubble.querySelectorAll('.cl-label').forEach((lb,i)=>{if(t.checklist[i])lb.className='cl-label'+(t.checklist[i].checked?' checked':'');});
+  }
 }
+
 function updatePosProgress(){
   const{total,done,pct}=posProgress(currentPos);
   const pb=document.getElementById('pos-prog-bar');const pl=document.getElementById('pos-prog-label');
   if(pb){pb.style.width=pct+'%';pb.style.background=pct===100?'#639922':pct>50?'var(--garnet)':'var(--gold)';}
   if(pl)pl.textContent=done+'/'+total+' items done';
 }
-function addCheckItem(taskId){const input=document.getElementById('cl-input-'+taskId);if(!input)return;const label=input.value.trim();if(!label)return;const t=tasks.find(x=>x.id===taskId);if(!t)return;if(!t.checklist)t.checklist=[];t.checklist.push({label,checked:false,customDue:'',notes:''});saveTasks();renderBoard();}
-function deleteCheckItem(taskId,idx){const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist)return;t.checklist.splice(idx,1);saveTasks();renderBoard();}
-function openEditInline(id){document.querySelectorAll('.edit-form').forEach(f=>f.classList.remove('open'));const form=document.getElementById('edit-form-'+id);if(form){form.classList.add('open');form.querySelector('input').focus();}}
-function closeEditInline(id){const form=document.getElementById('edit-form-'+id);if(form)form.classList.remove('open');}
-function saveEditInline(id){
-  const t=tasks.find(x=>x.id===id);if(!t)return;
+
+window.updateClDue=function(taskId,idx,val){
+  const t=tasks[taskId];if(!t||!t.checklist)return;
+  const auto=twoWeeksBefore(t.proposedDate);
+  t.checklist[idx].customDue=(val===auto)?'':val;
+  saveTask(t);renderBoard();
+};
+
+window.updateClNotes=function(taskId,idx,val){
+  const t=tasks[taskId];if(!t||!t.checklist)return;
+  t.checklist[idx].notes=val;
+  saveTask(t);
+};
+
+window.addCheckItem=function(taskId){
+  const input=document.getElementById('cl-input-'+taskId);if(!input)return;
+  const label=input.value.trim();if(!label)return;
+  const t=tasks[taskId];if(!t)return;
+  if(!t.checklist)t.checklist=[];
+  t.checklist.push({label,checked:false,customDue:'',notes:''});
+  saveTask(t);renderBoard();
+};
+
+window.deleteCheckItem=function(taskId,idx){
+  const t=tasks[taskId];if(!t||!t.checklist)return;
+  t.checklist.splice(idx,1);
+  saveTask(t);renderBoard();
+};
+
+window.openEditInline=function(id){
+  document.querySelectorAll('.edit-form').forEach(f=>f.classList.remove('open'));
+  const form=document.getElementById('edit-form-'+id);
+  if(form){form.classList.add('open');form.querySelector('input').focus();}
+};
+
+window.closeEditInline=function(id){
+  const form=document.getElementById('edit-form-'+id);if(form)form.classList.remove('open');
+};
+
+window.saveEditInline=function(id){
+  const t=tasks[id];if(!t)return;
   const title=document.getElementById('edit-title-'+id).value.trim();if(!title)return;
   const newDate=document.getElementById('edit-date-'+id).value||'';
   const dateChanged=newDate!==t.proposedDate;
@@ -386,19 +581,64 @@ function saveEditInline(id){
   t.desc=document.getElementById('edit-desc-'+id).value.trim();
   t.owners=document.getElementById('edit-owners-'+id).value.split(',').map(o=>o.trim()).filter(Boolean);
   if(dateChanged&&t.checklist){t.checklist.forEach(item=>{item.customDue='';});}
-  saveTasks();renderBoard();
+  saveTask(t);renderBoard();
+};
+
+window.deleteTask=function(id){
+  const t=tasks[id];
+  if(!confirm('Delete "'+t?.title+'"?'))return;
+  delete tasks[id];
+  deleteTaskDB(id);renderBoard();
+};
+
+// ── MODAL ─────────────────────────────────────────
+window.addModalOwner=function(){
+  const input=document.getElementById('modal-owner-input');
+  const name=input.value.trim();if(!name)return;
+  modalOwners.push(name);input.value='';renderModalOwners();
+};
+window.removeModalOwner=function(idx){modalOwners.splice(idx,1);renderModalOwners();};
+function renderModalOwners(){
+  const preview=document.getElementById('modal-owners-preview');if(!preview)return;
+  preview.innerHTML=modalOwners.map((o,i)=>'<span class="owner-chip"><span class="owner-chip-av">'+initials(o)+'</span>'+o+'<button class="owner-chip-rm" onclick="removeModalOwner('+i+')">&#x2715;</button></span>').join('');
 }
-function deleteTask(id){const t=tasks.find(x=>x.id===id);if(!confirm('Delete "'+t?.title+'"?'))return;tasks=tasks.filter(x=>x.id!==id);saveTasks();renderBoard();}
-document.getElementById('add-task-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-function addModalOwner(){const input=document.getElementById('modal-owner-input');const name=input.value.trim();if(!name)return;modalOwners.push(name);input.value='';renderModalOwners();}
-function removeModalOwner(idx){modalOwners.splice(idx,1);renderModalOwners();}
-function renderModalOwners(){const preview=document.getElementById('modal-owners-preview');if(!preview)return;preview.innerHTML=modalOwners.map((o,i)=>'<span class="owner-chip"><span class="owner-chip-av">'+initials(o)+'</span>'+o+'<button class="owner-chip-rm" onclick="removeModalOwner('+i+')">&#x2715;</button></span>').join('');}
-function openModal(){modalOwners=[];['modal-task-title','modal-task-desc','modal-owner-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('modal-task-date').value='';document.getElementById('modal-owners-preview').innerHTML='';document.getElementById('modal-cl-area').innerHTML='';document.getElementById('add-task-modal').classList.add('open');setTimeout(()=>document.getElementById('modal-task-title').focus(),50);}
-function closeModal(){document.getElementById('add-task-modal').classList.remove('open');}
-function addModalClItem(){const area=document.getElementById('modal-cl-area');const id='mcl-'+uid();const row=document.createElement('div');row.className='modal-cl-item';row.id=id;row.innerHTML='<input type="text" placeholder="Checklist item…" /><button class="modal-cl-remove" onclick="document.getElementById(\''+id+'\').remove()"><i class="ti ti-x"></i></button>';area.appendChild(row);row.querySelector('input').focus();}
-function saveModalTask(){const title=document.getElementById('modal-task-title').value.trim();if(!title)return;const proposedDate=document.getElementById('modal-task-date').value||'';const desc=document.getElementById('modal-task-desc').value.trim();const clItems=[...document.getElementById('modal-cl-area').querySelectorAll('.modal-cl-item input')].map(i=>i.value.trim()).filter(Boolean).map(label=>({label,checked:false,customDue:'',notes:''}));tasks.push({id:uid(),pos:currentPos,title,desc,proposedDate,owners:[...modalOwners],checklist:clItems});saveTasks();closeModal();renderBoard();}
-load();initSec();renderBoard();
+function openModal(){
+  modalOwners=[];
+  ['modal-task-title','modal-task-desc','modal-owner-input'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal-task-date').value='';
+  document.getElementById('modal-owners-preview').innerHTML='';
+  document.getElementById('modal-cl-area').innerHTML='';
+  document.getElementById('add-task-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-task-title').focus(),50);
+}
+window.closeModal=function(){document.getElementById('add-task-modal').classList.remove('open');};
+window.addModalClItem=function(){
+  const area=document.getElementById('modal-cl-area');
+  const id='mcl-'+uid();
+  const row=document.createElement('div');row.className='modal-cl-item';row.id=id;
+  row.innerHTML='<input type="text" placeholder="Checklist item…" /><button class="modal-cl-remove" onclick="document.getElementById(\''+id+'\').remove()"><i class="ti ti-x"></i></button>';
+  area.appendChild(row);row.querySelector('input').focus();
+};
+window.saveModalTask=function(){
+  const title=document.getElementById('modal-task-title').value.trim();if(!title)return;
+  const proposedDate=document.getElementById('modal-task-date').value||'';
+  const desc=document.getElementById('modal-task-desc').value.trim();
+  const clItems=[...document.getElementById('modal-cl-area').querySelectorAll('.modal-cl-item input')]
+    .map(i=>i.value.trim()).filter(Boolean).map(label=>({label,checked:false,customDue:'',notes:''}));
+  const newTask={id:uid(),pos:currentPos,title,desc,proposedDate,owners:[...modalOwners],checklist:clItems};
+  tasks[newTask.id]=newTask;
+  saveTask(newTask);closeModal();renderBoard();
+};
+
+document.getElementById('add-task-modal').addEventListener('click',function(e){if(e.target===this)window.closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
+
+setTimeout(()=>{
+  const iframe=document.getElementById('drive-iframe');
+  if(!iframe)return;
+  try{const doc=iframe.contentDocument||iframe.contentWindow?.document;if(doc&&doc.body&&doc.body.innerHTML===''){iframe.style.display='none';document.getElementById('drive-blocked').style.display='flex';}}catch(e){}
+},8000);
+
 </script>
 </body>
 </html>
