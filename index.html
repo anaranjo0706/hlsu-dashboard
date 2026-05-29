@@ -447,7 +447,7 @@ function renderBoard(){
   const pt=Object.values(tasks).filter(t=>t.pos===currentPos);
   const{total,done,pct}=posProgress(currentPos);
   titleEl.textContent=p.label;
-  actionsEl.innerHTML='<button class="btn" onclick="currentPos=null;renderBoard()"><i class="ti ti-arrow-left"></i> Back</button>';
+  actionsEl.innerHTML='<button class="btn" onclick="goBack()"><i class="ti ti-arrow-left"></i> Back</button>';
   content.innerHTML='';
   const wrap=document.createElement('div');wrap.className='detail-wrap';
   wrap.innerHTML='<div class="detail-toprow"><div class="detail-pos-name">'+p.label+'</div><span class="seats-badge">'+p.seats+' seat'+(p.seats>1?'s':'')+'</span></div><div style="display:flex;align-items:center;gap:10px"><div class="prog-wrap" style="flex:1;height:7px"><div class="prog-bar" id="pos-prog-bar" style="width:'+pct+'%;height:7px;background:'+(pct===100?'#639922':pct>50?'var(--garnet)':'var(--gold)')+'"></div></div><span style="font-size:11px;color:var(--text3);white-space:nowrap" id="pos-prog-label">'+done+'/'+total+' items done</span></div>';
@@ -502,6 +502,8 @@ function buildBubble(t,p){
   bubble.appendChild(editForm);
   return bubble;
 }
+
+window.goBack=function(){currentPos=null;renderBoard();};
 
 // ── TASK ACTIONS ──────────────────────────────────
 window.autoResize=function(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';};
